@@ -8,9 +8,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -19,6 +22,14 @@ public class GameActivity extends AppCompatActivity {
     private RelativeLayout group;
     private Button[][] buttons;
     private String[] letters;
+    private TextView textStep;
+    private int stepCount = 0;
+    private TextView textTime;
+    private Timer timer;
+    private int timeCount = 0;
+    private Button buttonAcak;
+    private Button buttonStop;
+    private Boolean isTimeRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,11 +105,69 @@ public class GameActivity extends AppCompatActivity {
 
     private void loadViews() {
         group = findViewById(R.id.group);
+        textStep = findViewById(R.id.text_step);
+        textTime = findViewById(R.id.text_time);
+        buttonAcak = findViewById(R.id.btn_acak);
+        buttonStop = findViewById(R.id.btn_stop);
+
+        loadTimer();
+
         buttons = new Button[4][4];
 
         for (int i = 0; i < group.getChildCount(); i++) {
             buttons[i/4][i%4] = (Button) group.getChildAt(i);
         }
+
+        buttonAcak.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                generateLatters();
+                loadDataToViews();
+            }
+        });
+
+        buttonStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isTimeRunning) {
+                    timer.cancel();
+                    buttonStop.setText("Lanjutkan");
+                    isTimeRunning = false;
+
+                    for (int i = 0; i < group.getChildCount(); i++) {
+                        buttons[i/4][i%4].setClickable(false);
+                    }
+                } else {
+                    loadTimer();
+                    buttonStop.setText("Berhenti");
+
+                    for (int i = 0; i < group.getChildCount(); i++) {
+                        buttons[i/4][i%4].setClickable(true);
+                    }
+                }
+            }
+        });
+    }
+
+    private void loadTimer() {
+        isTimeRunning = true;
+        timer = new Timer();
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                timeCount++;
+                setTime(timeCount);
+            }
+        }, 1000, 1000);
+    }
+
+    private void setTime(int timeCount) {
+        int second = timeCount % 60;
+        int hour = timeCount / 60;
+        int minute = (timeCount - hour * 3600) / 60;
+
+        textTime.setText(String.format("Waktu : %02d:%02d:%02d", hour, minute, second));
     }
 
     public void buttonClick(View view) {
@@ -115,6 +184,9 @@ public class GameActivity extends AppCompatActivity {
 
             emptyX = x;
             emptyY = y;
+
+            stepCount++;
+            textStep.setText("Waktu : " + stepCount);
 
             checkWin();
         }
@@ -134,11 +206,17 @@ public class GameActivity extends AppCompatActivity {
         }
 
         if (isWin) {
-            Toast.makeText(this, "MENANG !!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "MENANG !!!\nLangkah : " + stepCount, Toast.LENGTH_LONG).show();
 
             for (int i = 0; i < group.getChildCount(); i++) {
                 buttons[i/4][i%4].setClickable(false);
             }
+
+            timer.cancel();
+
+            buttonAcak.setClickable(false);
+
+            buttonStop.setClickable(false);
         }
     }
 }
