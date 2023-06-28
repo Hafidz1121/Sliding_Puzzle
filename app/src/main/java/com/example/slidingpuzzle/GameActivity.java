@@ -18,7 +18,7 @@ public class GameActivity extends AppCompatActivity {
     private int emptyY =3;
     private RelativeLayout group;
     private Button[][] buttons;
-    private int[] tiles;
+    private String[] letters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +26,8 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
         loadViews();
-        loadNumbers();
-        generateNumbers();
+        loadLatters();
+        generateLatters();
         loadDataToViews();
     }
 
@@ -36,7 +36,7 @@ public class GameActivity extends AppCompatActivity {
         emptyY = 3;
 
         for (int i = 0; i < group.getChildCount() - 1; i++) {
-            buttons[i/4][i%4].setText(String.valueOf(tiles[i]));
+            buttons[i/4][i%4].setText(String.valueOf(letters[i]));
             buttons[i/4][i%4].setBackgroundResource(android.R.drawable.btn_default);
         }
 
@@ -44,19 +44,19 @@ public class GameActivity extends AppCompatActivity {
         buttons[emptyX][emptyY].setBackgroundColor(ContextCompat.getColor(this, R.color.freeButton));
     }
 
-    private void generateNumbers() {
+    private void generateLatters() {
         int n = 15;
         Random random = new Random();
 
         while (n > 1) {
-            int randomNum = random.nextInt(n--);
-            int temp = tiles[randomNum];
-            tiles[randomNum] = tiles[n];
-            tiles[n] = temp;
+            int randomIndex = random.nextInt(n--);
+            String temp = letters[randomIndex];
+            letters[randomIndex] = letters[n];
+            letters[n] = temp;
         }
 
         if (!isSolvable()) {
-            generateNumbers();
+            generateLatters();
         }
     }
 
@@ -65,7 +65,7 @@ public class GameActivity extends AppCompatActivity {
 
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < i; j++) {
-                if (tiles[j] > tiles[i])
+                if (letters[j].compareTo(letters[i]) > 0)
                     countInversions++;
             }
         }
@@ -73,12 +73,23 @@ public class GameActivity extends AppCompatActivity {
         return countInversions % 2 == 0;
     }
 
-    private void loadNumbers() {
-        tiles = new int[16];
-
-        for (int i = 0; i < group.getChildCount(); i++) {
-            tiles[i] = i + 1;
-        }
+    private void loadLatters() {
+        letters = new String[16];
+        letters[0] = "A";
+        letters[1] = "B";
+        letters[2] = "C";
+        letters[3] = "D";
+        letters[4] = "E";
+        letters[5] = "F";
+        letters[6] = "G";
+        letters[7] = "H";
+        letters[8] = "I";
+        letters[9] = "J";
+        letters[10] = "K";
+        letters[11] = "L";
+        letters[12] = "M";
+        letters[13] = "N";
+        letters[14] = "O";
     }
 
     private void loadViews() {
@@ -93,8 +104,8 @@ public class GameActivity extends AppCompatActivity {
     public void buttonClick(View view) {
         Button button = (Button) view;
 
-        int x = button.getTag().toString().charAt(0)-'0';
-        int y = button.getTag().toString().charAt(1)-'0';
+        int x = button.getTag().toString().charAt(0) - '0';
+        int y = button.getTag().toString().charAt(1) - '0';
 
         if ((Math.abs(emptyX - x) == 1 && emptyY == y) || (Math.abs(emptyY - y) == 1 && emptyX == x)) {
             buttons[emptyX][emptyY].setText(button.getText().toString());
@@ -110,15 +121,15 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void checkWin() {
-        boolean isWin = false;
-        if (emptyX == 3 && emptyY == 3) {
-            for (int i = 0; i < group.getChildCount() - 1; i++) {
-                if (buttons[i/4][i%4].getText().toString().equals(String.valueOf(i + 1))) {
-                    isWin = true;
-                } else {
-                    isWin = false;
-                    break;
-                }
+        boolean isWin = true;
+
+        for (int i = 0; i < group.getChildCount() - 1; i++) {
+            String expectedLetter = String.valueOf((char) ('A' + i));;
+            String actualLetter = buttons[i/4][i%4].getText().toString();
+
+            if (!expectedLetter.equals(actualLetter)) {
+                isWin = false;
+                break;
             }
         }
 
