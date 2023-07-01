@@ -30,6 +30,7 @@ public class GameActivity extends AppCompatActivity {
     private Button buttonAcak;
     private Button buttonStop;
     private Boolean isTimeRunning;
+    private MyBase myBase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,6 +218,36 @@ public class GameActivity extends AppCompatActivity {
             buttonAcak.setClickable(false);
 
             buttonStop.setClickable(false);
+
+            saveData();
         }
+    }
+
+    private void saveData() {
+        myBase = new MyBase(GameActivity.this);
+        myBase.saveLastStep(stepCount);
+        myBase.saveLastTimer(timeCount);
+
+        if (myBase.getBestStep() != 0) {
+            if (myBase.getBestStep() > stepCount) {
+                myBase.saveBestStep(stepCount);
+            }
+        } else {
+            myBase.saveBestStep(stepCount);
+        }
+
+        if (myBase.getBestTimer() != 0) {
+            if (myBase.getBestTimer() > timeCount) {
+                myBase.saveBestTimer(timeCount);
+            }
+        } else {
+            myBase.saveBestTimer(timeCount);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        setResult(MainActivity.REQUEST_CODE);
     }
 }
