@@ -1,10 +1,17 @@
 package com.example.slidingpuzzle;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -41,6 +48,54 @@ public class GameActivity extends AppCompatActivity {
         loadLatters();
         generateLatters();
         loadDataToViews();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.option_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.ulangi) {
+            generateLatters();
+            loadDataToViews();
+
+            stepCount = 0;
+            textStep.setText("Langkah : " + stepCount);
+            timeCount = 0;
+            textTime.setText("Waktu : " + timeCount);
+        } else if (item.getItemId() == R.id.keluar) {
+            showLogoutConfirmationDialog();
+        }
+
+        return true;
+    }
+
+    private void showLogoutConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Notifikasi Konfirmasi");
+        builder.setMessage("Apakah Anda Yakin Ingin Keluar?");
+        builder.setIcon(R.drawable.baseline_warning_24);
+        builder.setNegativeButton("Ya", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Handle logout action
+                finishAffinity();
+            }
+        });
+        builder.setPositiveButton("Tidak", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Cancel the dialog
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void loadDataToViews() {
@@ -165,7 +220,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void setTime(int timeCount) {
         int second = timeCount % 60;
-        int hour = timeCount / 60;
+        int hour = timeCount / 3600;
         int minute = (timeCount - hour * 3600) / 60;
 
         textTime.setText(String.format("Waktu : %02d:%02d:%02d", hour, minute, second));
@@ -187,7 +242,7 @@ public class GameActivity extends AppCompatActivity {
             emptyY = y;
 
             stepCount++;
-            textStep.setText("Waktu : " + stepCount);
+            textStep.setText("Langkah : " + stepCount);
 
             checkWin();
         }

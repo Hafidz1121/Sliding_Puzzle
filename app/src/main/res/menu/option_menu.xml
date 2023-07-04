@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        app:showAsAction="always"
+        android:icon="@drawable/baseline_more_vert_24"
+        android:title="">
+
+        <menu>
+            <item
+                android:id="@+id/ulangi"
+                android:title="Ulangi"
+                android:icon="@drawable/baseline_autorenew_24"
+                app:showAsAction="never"/>
+            <item
+                android:id="@+id/keluar"
+                android:title="Keluar"
+                android:icon="@drawable/baseline_power_settings_new_24"
+                app:showAsAction="never"/>
+        </menu>
+
+    </item>
+</menu>
